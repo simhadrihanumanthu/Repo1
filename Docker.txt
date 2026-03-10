@@ -1,0 +1,280 @@
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Q1. What is Docker?
+Answer: 
+Docker is an open source containerization tool used to pack the application along with dependencies into a lightweight portable unit called containers.
+It ensures consistency across development, testing, and production environments by bundling the application with all its required dependencies.
+Key components
+Docker CLI – used to run commands
+Docker Daemon – manages images and containers
+Docker Images – blueprints of the application
+Docker Containers – Live running application
+Docker Registry – Used to store images
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Q2. Explain Docker architecture?
+Answer: 
+Docker follows a client-server architecture where the Docker Client communicates with the Docker Daemon using REST APIs. 
+Docker Client (CLI): we use docker cli to run commands like docker build, docker run, and docker pull.
+Docker Daemon: The actual commands gets executed here. docker daemon is responsible for Building images, creating containers Managing networks and volumes.
+Docker Host: The actual server where we installed docker is called docker host.
+Docker Registry: Docker registry is used to store the docker images.
+Docker Images: Docker images are nothing but blueprint of our application along with dependencies
+command to build a docker image : docker build -t image1:version1 .
+Docker Containers: Docker containers are nothing but the live running application
+command to create the containers: docker run -d --name cont1 -p 8080:80 image:version1
+
+Workflow --> docker cli ---> docker daemon ----> docker registry -----> image pull -----> docker container 
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Q3. What is the difference between Docker image and Docker container?
+Answer: 
+Docker images is nothing but blueprint of our application along with dependencies 
+command: docker build -t image1:v1 . 
+
+docker containers: containers are nothing but runtime instances of a docker images 
+command: docker run -d --name cont1 -p 8080:80 image1:v1 
+Every time we run the image a container gets created, with one image we can create multiple containers.
+Images cannot be modified once built; containers can have changes in their writable layer.
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Q4. What is the difference between COPY and ADD?
+
+Answer:
+COPY: copy is used to copy the files or directories from local server to the docker image.
+
+ADD: add is also used to copy the files from local to the docker image similar to copy.
+in addition it can also download files from URLs and place them in docker image
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Q5. What is the difference between CMD and ENTRYPOINT?
+
+Answer:
+CMD: cmd is used to run the commands inside a container
+CMD["python", "app.py"]
+we can overwrite the values in CMD during runtime.
+
+ENTRYPOINT: Entrypoint is also used to run the commands inside a container
+entrypoint has main executable that will always run.
+we cannot overwrite the values in ENTRYPOINT during runtime.
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Q6. What is the difference between RUN and CMD?
+
+Answer:
+RUN: it is used to execute the commands while creating the image.
+we can have multiple RUN inside a Dockerfile.
+we cannot overwrite the values inside the RUN while we build the image
+
+CMD: it is used to execute the commands while we create the container
+we can have only one CMD in a Dockerfile
+we can overwrite the values inside the CMD during the runtime
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Q7. What is the difference between ARGS and ENV?
+Answer:
+ARGS: it is used to pass the variables while we build the docker image
+The variables inside the ARGS can be overwritten while we build the image
+the variables passed through ARGS will not be available inside the cotainers
+
+ENV: it is also used to pass the variables while we build the image
+The variables inside the ENV cannot be overwritten while we build the image
+the variables passed through ENV will be present inside the container
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Q8. How do you reduce Docker image size?
+Answer:
+First we need to use Alpine or slim images as base image
+We need to use multistage dockerfile to create the images
+we need to use .dockerignore file to avoid copying unnecessary files into docker images
+delete temporary files after installation
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Q9. What is a multi-stage docker build?
+Multi stage docker build allows us to write multiple stages inside one Dockerfile using several FROM statements.
+in the first stage we can build the application along with all required dependencies so the image size will me more and which is not recommended for production.
+in the second stage we will be using Apline or slim images and we can copy the required artifacts from the previous stage so that dependencies are eliminated and the images size will be less and we can have more security.
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Q10. What is docker compose?
+
+Answer:
+Docker compose is a tool that allows us to create multiple containers using a single docker-compse.yml file
+we can mention all the services in a single YAML file like application, database, networks, volumes.
+without docker compose we need to manually run multiple docker run commands to create the services.
+Command: docker compose up -d ----> to create all the services at a time
+command: docker compose down ----> to delete all the services at a time
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Q11. What is docker swarm?
+
+Answer:
+Docker swarm is a container orchestration tool used to create multiple services across the cluster.
+Docker swarm has manager and worker nodes where we need to install the docker, docker swarm has self healing capability and manual scaling.
+we can maintain multiple replicas of a service 
+command: docker service create --name FLM --publish 8080:80 --replicas=4 shaikmustafa/patym:bus
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Q12. What is docker stack?
+
+Answer:
+Docker stack is a part of docker swarm used t create multiple services across the cluster.
+we need to write docker-compose.yml file to create the list of services
+command: docker stack deploy Simha --compose-file=compose.yml
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Q13. What are docker volumes?
+
+Docker volumes is a way to store the data created by containers, when container gets deleted the data still be there in docker volumes.
+containers are very short living objects so it is necessary to store data outside the containers so we can use docker volumes to store the data.
+we can use same volume to attach to multiple containers, by this we can achieve data replication across the containers
+Command: docker volume create volume1
+Command: docker run -itd --name cont1 --mount src=volume1 dest=/usr/local/apache2/htdocs/
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Q14. What does EXPOSE 8080 do in a Dockerfile?
+
+Answer:
+Expose is used to document the port details, by looking at expose we can come to know that which port the application is listening to.
+so developers come to know the port details by looking at expose in dockerfile. this is only for documentation purpose it will not publish any port no.
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Q15. How do you get a running containers IP address?
+
+Answer:
+docker inspect container1 by inspecting the container we can come to know all details about the container.
+Alternatively we can use docker inspect cont1 | grep -i ipaddress
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Q16.  What is a dockerfile?
+
+Answer:
+Dockerfile is a blueprint for building the docker images.
+dockerfile contains the set of instructions to create the images.
+some of the dockerfile components are FROM, LABEL, MAINTAINER, EXPOSE, COPY, CMD, ENTRYPOINT.
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+Q17. What is the difference between Containers and Virtual machines?
+
+Answer:
+Containers: containers are compact and lightweight
+they start very fast within seconds the container gets started
+containers are used to deploy micro services applications
+here in containers virtualization happens at OS level
+
+Virtual Machines: virtual machines are heavy like it is having high CPU and Memory.
+it takes longer time to start and it takes time in minutes to start 
+virtual machines are best suitable for monolithic applications
+Virtualization happens here at hardware level.
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Q18. How does resource allocation work for containers?
+
+Answer: By default containers share the host resources. Using control groups we can set the limits for CPU and Memory to a container.
+If any container is using more memory than the allocated memory the container get killed by OOM error.
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Q19. What is docker networks? Explain each type.
+
+Answer:
+Docker networks allows to containers to communicate with each other.
+Types of Networks:
+Bridge Network: bridge network is a default network for containers, containers can communicate with each other in the same bridge network.
+Host Network: The container directly uses host network, there will be no isolation for host and container both uses same network.
+None network: The containers created by non network will not have any network.
+Overlay Network: Using overlay network the containers on different servers can communicate with each other, we use overlay network when we create services using docker swarm and docker stack.
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Q20. Write a dockerfile or multistage Dockerfile.
+
+------------------------------------------------------------------------------
+# WRITE A MULTI STAGE DOCKERFILE FOR A HTTPD APPLICATION FOR PRODUCTION
+# Stage 1: Build the application
+FROM httpd:alpine AS build
+WORKDIR /app
+COPY . .
+# Stage 2: Serve the application
+FROM httpd:alpine
+WORKDIR /app
+COPY --from=build /app ./
+EXPOSE 80
+CMD ["httpd-foreground"]
+
+------------------------------------------------------------------------------
+# WRITE A MULTI STAGE DOCKERFILE FOR NGINX FOR PRODUCTION
+# Stage 1: Build the application
+FROM nginx:alpine AS build
+WORKDIR /app
+COPY . .
+# Stage 2: Serve the application
+FROM nginx:alpine
+WORKDIR /app
+COPY --from=build /app ./
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]
+
+--------------------------------------------------------------------------------
+# WRITE A MULTI STAGE DOCKERFILE FOR A JAVA APPLICATION FOR PRODUCTION
+# Stage 1: Build the application
+FROM maven:3.8.4-openjdk-17 AS build
+WORKDIR /app
+COPY pom.xml ./
+RUN mvn dependency:go-offline
+COPY src ./src
+RUN mvn package -DskipTests
+# Stage 2: Serve the application
+FROM openjdk:17-alpine
+WORKDIR /app
+COPY --from=build /app/target/*.jar app.jar
+EXPOSE 8080
+CMD ["java", "-jar", "app.jar"]
+
+----------------------------------------------------------------------------------
+WRITE A MULTI STAGE DOCKERFILE FOR A NODE APPLICATION FOR PRODUCTION
+# Stage 1: Build the application
+FROM node:14 AS build
+WORKDIR /app
+COPY package.json ./
+RUN npm install
+COPY . .
+RUN npm run build
+# Stage 2: Serve the application
+FROM node:14-alpine
+WORKDIR /app
+COPY --from=build /app ./
+EXPOSE 3000
+CMD ["npm", "start"]
+
+------------------------------------------------------------------------------------
+# WRITE A MULTI STAGE DOCKERFILE FOR A PYTHON APPLICATION FOR PRODUCTION
+# Stage 1: Build the application
+FROM python:3.9 AS build
+WORKDIR /app
+COPY requirements.txt ./
+RUN pip install --no-cache-dir -r requirements.txt
+COPY . .
+# Stage 2: Serve the application
+FROM python:3.9-alpine
+WORKDIR /app
+COPY --from=build /app ./
+EXPOSE 8000
+CMD ["python", "app.py"]
+
+--------------------------------------------------------------------------------------
+# WRITE A MULTI STAGE DOCKERFILE FOR A REACT APPLICATION FOR PRODUCTION
+# Stage 1: Build the application
+FROM node:14 AS build
+WORKDIR /app
+COPY package.json ./
+RUN npm install
+COPY . .
+RUN npm run build
+# Stage 2: Serve the application
+FROM nginx:alpine
+WORKDIR /app
+COPY --from=build /app/build /usr/share/nginx/html
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]
+
+---------------------------------------------------------------------------------------
+# WRITE A MULTI STAGE DOCKERFILE FOR A MYSQL APPLICATION FOR PRODUCTION
+# Stage 1: Build the application
+FROM mysql:8.0 AS build
+WORKDIR /app
+COPY . .
+# Stage 2: Serve the application
+FROM mysql:8.0
+WORKDIR /app
+COPY --from=build /app ./
+EXPOSE 3306
+CMD ["mysqld"]
+---------------------------------------------------------------------------------------
