@@ -1,0 +1,452 @@
+i want you to validate my understing, When user want to access the application inside a container how the traffic flow happens
+User hitting url in internet--->it will go to External DNS---> cloud load balancer----> ingress----> clusterip service---> pod----> container 
+
+Q1. What is a Pod?
+Answer:
+Pod is a smallest deployable object that we can create in Kubernetes. It represents a single instance of a running application.
+A pod can contain one or more containers that share the same network, namespace, IP address, and storage volumes.
+Pods are ephemeral, meaning they will be created and destroyed dynamically, ReplicaSet takes care of pods.
+
+Q2. What is Ingress?
+Answer:
+Ingress is a Kubernetes API object that manages external access to services within a cluster, typically through HTTP or HTTPS.
+Ingress is used to route the traffic to backend services using host based routing and path based routing.
+We can route the traffic to multiple services using single Ingress.
+User ---> DNS ----> External Load balancer ----> Ingress ---> Service ----> Pod -----> container(Application)
+
+Q3. What is the difference between Deployment and StatefulSet?
+Answer:
+Deployment: Deployment is used to manage stateless applications in Kubernetes. Stateless means no past data will be stored its means data gets deleted when pod get deleted.
+We use Deployments mostly for applications
+All the pods in deployment gets created at the same time.
+the order of deletion of pods will be random.
+Pod name: deployment-RS-Random ID- Pod Random ID.
+
+Statefulset: SatefulSet is a stateful object in Kubernetes.
+In statefulSet the data will be still there even the pod gets deleted. It stores the past data, Statefulset is mainly used to create databases.
+the pods get created one after the another by cloning the data from the previous pods.
+the order of deletion of pods will be last in first out mechanism
+Pod Name: flm0, flm1, flm2 ...
+
+Q4. What deployment strategy have you used?
+Answer: i know these types of deployment strategies so suggest me which one to explain in interview.
+a) re-create
+b) roling updates
+c) blue- green deployment
+d) canary deployment 
+In my projects, the most commonly used deployment strategy is Rolling Update.
+Rolling Update is the default deployment strategy used by Kubernetes Deployments to update applications without downtime.
+When a new version of the application is deployed, Kubernetes creates a new ReplicaSet and gradually starts new pods from it while simultaneously terminating pods from the old ReplicaSet.
+This ensures that the application remains available during the update process.
+The number of pods created or removed at a time is controlled using the parameters maxSurge and maxUnavailable.
+
+Q5. Explain Kubernetes architecture?
+Answer:
+Kubernetes architecture follows a master-worker architecture where the Control Plane manages the cluster, and Worker Nodes run the containerized applications.
+Control Plane: The control plane manages the overall cluster state and scheduling
+API Server: Using API sever we perform all the operations.
+etcd: Stores all cluster data such as: Pods, Services, ConfigMaps, Secrets, Cluster state
+Scheduler: Schedular decides in which node the pod has  to be created based on CPU, Memory, Node availability, Taints and tolerations
+Controller Manager: controller manager maintains the desired state of the cluster.
+Replica controller: It will maintain the desired no of replicas of the pod, if a pod get deleted it will automatically creates another pod.
+Node controller: It will maintain the desired no of nodes to be running in the cluster, if a node gets deleted it will automatically creates another node.
+Service controller: It will maintain the service, if a service gets deleted it will create a service automatically.
+
+Worker Node:
+Worker nodes are responsible for running application workloads.
+Kubelet: Kublet Communicates with API server, Ensures containers are running as expected.
+Kube Proxy: kube-proxy is a network component that runs on each worker node and manages network rules to enable communication between services and pods.
+Container Runtime: A container runtime is responsible for pulling container images and running containers on Kubernetes worker nodes 
+Pod: Pod is a smallest deployable object that we can create in Kubernetes. It represents a single instance of a running application.
+
+
+Q6. How do you troubleshoot a pod in CrashLoopBackOff?
+Answer:
+When a pod is in CrashLoopBackOff, it means the container is repeatedly crashing and Kubernetes is restarting it.
+First, I check the pod status using: kubectl get pods, This helps identify the pod-name and restart count.
+Next, I run:kubectl describe pod <pod-name>. This shows events and possible errors such as image pull issues, configuration problems, or resource limits.
+Then I check container logs using: kubectl logs <pod-name>.
+If the pod restarted, I check previous logs using: kubectl logs <pod-name> --previous
+Common causes for CrashLoopBackOff include incorrect environment variables, misconfigured ConfigMaps or Secrets, application errors, or resource issues such as OOMKilled due to insufficient memory limits.
+
+Q7. What happens when a pod goes into CrashLoopBackOff?
+Answer:
+When a pod goes into CrashLoopBackOff error the Kubernetes repeatedly restarts the container inside the pod, the possible reasons that pod going into crashloopbackoff error are due to incorrect environment variables, may be due to configmaps and secrets are not correct, may be pod is using excess memory than the limits and got killed by OOM issue.
+Troubleshoot using the following commands.
+Kubectl get pods
+kubectl describe pod podname
+kubectl logs podname
+kubectl logs podname --previous
+
+Q8. What is CrashLoopBackOff?
+Answer:
+CrashLoopBackOff occurs when a container inside a pod repeatedly crashes after starting. Kubernetes automatically tries to restart the container, but if the container keeps failing, Kubernetes applies an exponential backoff delay between restart attempts.
+The possible reasons that pod going into crashloopbackoff error are due to incorrect environment variables, may be due to configmaps and secrets are not correct, may be pod is using excess memory than the limits and got killed by OOM issue.
+Troubleshoot using the following commands.
+Kubectl get pods
+kubectl describe pod podname
+kubectl logs podname
+kubectl logs podname --previous
+
+Q9. What does Pod NotReady state mean?
+Answer:
+Pod NotReady means the pod is running but it is not ready to serve traffic.
+This usually happens when the readiness probe fails, indicating that the application inside the container is not yet ready to handle requests.
+While the pod is in NotReady state, Kubernetes removes it from the Service endpoints, so it will not receive traffic until the readiness probe succeeds.
+
+Q10. How do you check logs of a pod?
+Answer: 
+To check logs of a pod, first I identify the pod using: kubectl get pods
+Then I retrieve the logs using: kubectl logs <pod-name>
+If the pod has multiple containers, I specify the container name: kubectl logs <pod-name> -c <container-name>
+If the container has restarted, I check previous logs using: kubectl logs <pod-name> --previous
+
+Q11. If a pod is not coming up, what steps will you take?
+
+Answer:
+If a pod is not coming up, first I check the pod status using:kubectl get pods
+This helps identify the pod status such as Pending, CrashLoopBackOff, or ImagePullBackOff.
+Next, I inspect the pod details and events using: kubectl describe pod <pod-name>
+This shows scheduling issues, image pull errors, or configuration problems.
+Then I check the container logs using: kubectl logs <pod-name>
+If the container restarted, I check previous logs: kubectl logs <pod-name> --previous
+Common reasons why a pod may not start include incorrect container image, wrong environment variables, misconfigured ConfigMaps or Secrets, resource limits, or application errors.
+
+Real case Examples why pod is not coming up: 
+
+ImagePullBackOff → wrong image name or registry auth issue
+CrashLoopBackOff → application crash
+Pending → insufficient CPU/memory or scheduling issue
+
+Q12. Readiness & Liveness probes?
+Answer:
+Readiness and Liveness probes are health checks used by Kubernetes to monitor container health
+
+Readiness probes: Readiness Probe checks whether the container is ready to serve traffic. If the readiness probe fails, Kubernetes removes the pod from the Service endpoints, so it will not receive traffic until it becomes ready.
+
+Liveness Probes: Liveness Probe checks whether the application inside the container is still running properly. If the liveness probe fails, Kubernetes restarts the container automatically using kubelet.  
+
+Q13. What is Blue-Green deployment?
+Answer: 
+Blue-Green deployment is a release strategy where two identical environments are maintained, called Blue and Green.
+The Blue environment represents the current production version, while the Green environment contains the new version of the application.
+Once the Green deployment is verified and running correctly, traffic is switched from the Blue environment to the Green environment.
+In Kubernetes, this is commonly implemented by having two deployments with different labels and updating the Service selector to route traffic from the Blue pods to the Green pods.
+This approach minimizes downtime and allows quick rollback if issues occur.  
+
+Q14. What is Rolling Update?
+Answer:
+Rolling Update is the default deployment strategy used by Kubernetes Deployments to update applications without downtime.
+When a new version of the application is deployed, Kubernetes creates a new ReplicaSet and gradually starts new pods from it while simultaneously terminating pods from the old ReplicaSet.
+This ensures that the application remains available during the update process.
+The number of pods created or removed at a time is controlled using the parameters maxSurge and maxUnavailable.
+
+Q15. What are the core components of Kubernetes?
+Answer:
+Kubernetes architecture consists of two main parts: Control Plane and Worker Nodes.
+The Control Plane manages the cluster and includes components such as:
+API Server – the entry point for all Kubernetes commands and communication between components.
+Scheduler – assigns newly created pods to worker nodes based on available resources.
+Controller Manager – runs controllers that ensure the cluster maintains the desired state, such as maintaining the required number of pods.
+etcd – a distributed key-value store that stores all cluster data and configuration.
+The Worker Nodes run the application workloads and include:
+kubelet – an agent that communicates with the API server and ensures containers are running in the pods.
+kube-proxy – manages networking rules and enables communication between services and pods.
+Container Runtime – responsible for pulling images and running containers.
+Finally, applications run inside Pods, which are the smallest deployable units in Kubernetes.
+
+Q16. Why do we use Kubernetes?
+Answer:
+Kubernetes is used to orchestrate and manage containerized applications at scale. It helps automate deployment, scaling, networking, and management of containers across multiple servers.
+Kubernetes ensures high availability and reliability by automatically handling tasks like load balancing, self-healing, rolling updates, and resource management.
+
+Q18. What is a Deployment?
+Answer:
+Deployment is a Kubernetes controller used to manage stateless applications.
+It ensures that the desired number of pod replicas are running in the cluster.
+A Deployment manages ReplicaSets, which in turn manage the Pods.
+Deployments provide features such as scaling, rolling updates, and rollback, allowing applications to be updated without downtime.
+
+Q19. What is a StatefulSet?
+Answer:
+statefulSet is a Kubernetes controller used to manage stateful applications.
+It ensures that desired number of pods are running always.
+the order of names of pods will be flm0, flm1, flm2.
+The First pod of StatefulSet will have read write access, while the remaining pods will have read only access.
+The order of creation of pods will be in sequential order, the order of deletion of pods will be Last in first out mechanism.
+The pods will have PV/PVC storage.
+
+Q20. What is a DaemonSet?
+Answer:
+A DaemonSet ensures that a specific pod runs on every node in the cluster.
+Each node will have one Daemonset agent by default, if a new node is added to the cluster by default it will create a agent pod in that pod.
+If the node is deleted automatically the pod will be deleted. Daemon is used to get the metrics of the server.
+DaemonSets are typically used for node-level services such as log collection, monitoring agents, or networking components.
+
+Q21. What is the relationship between Deployment, ReplicaSet, and Pod?
+Answer:
+Deployment, ReplicaSet, and Pods have a hierarchical relationship in Kubernetes.
+Deployment is a higher-level controller that manages ReplicaSets and provides features like rolling updates and rollback.
+ReplicaSet ensures that the desired number of pod replicas are always running. If a pod crashes, the ReplicaSet automatically creates a new one.
+Pods are the smallest deployable units in Kubernetes and contain the containers running the application.
+
+Q22. Why StatefulSet for MySQL?
+Answer:
+StatefulSet is used for MySQL because MySQL is a stateful application that requires stable identity, persistent storage, and ordered deployment. StatefulSet ensures that each pod has a stable hostname, dedicated persistent storage, and predictable startup order, which is important for database replication and data consistency.
+
+Q23. What is PVC?
+Answer:
+PersistentVolumeClaim (PVC) is a request for storage made by a user or application in Kubernetes.
+It allows a pod to request persistent storage without needing to know the details of the underlying storage infrastructure.
+Pod requests storage using PVC
+PVC requests storage from Kubernetes
+Kubernetes binds PVC to a PersistentVolume
+PV provides the actual storage from backend systems
+
+Q24. Can we attach PV/PVC to a Deployment?
+Answer:
+Yes, we can attach a PersistentVolumeClaim (PVC) to a Deployment. 
+The PVC is mounted as a volume inside the pod, allowing containers to store data outside the pod. 
+This ensures that the data persists even if the pod is deleted or restarted.
+However, when using Deployments with multiple replicas, the storage access mode must support shared access such as ReadWriteMany. 
+Otherwise, if the volume supports only ReadWriteOnce, only one pod can mount it at a time.
+
+Deployments use a single PVC because all pods are created from the same template and share the same volume definition. 
+Deployments are designed for stateless applications where pods are interchangeable. 
+StatefulSets, on the other hand, use volumeClaimTemplates to automatically create a unique PVC for each pod, 
+which is required for stateful applications like databases.
+
+Q25. Can we create StatefulSet without PV/PVC?
+Answer:
+Yes, we can create a StatefulSet without PV/PVC, but the main purpose of using StatefulSet will not be fulfilled. 
+StatefulSets are typically used for stateful applications that require persistent storage. 
+If no persistent volumes are attached, the data will be stored inside the container filesystem and will be lost when the pod is deleted or restarted.
+
+Q26. What is RBAC in Kubernetes?
+Answer:
+RBAC stands for Role-Based Access Control in Kubernetes. It is used to control access to Kubernetes resources by assigning permissions to users, groups, or service accounts. 
+RBAC helps secure the cluster by ensuring users only have the permissions they need.
+Kubernetes RBAC mainly consists of four resources:
+Role – defines permissions within a specific namespace
+RoleBinding – assigns a Role to a user, group, or service account
+ClusterRole – defines permissions across the entire cluster
+ClusterRoleBinding – assigns a ClusterRole to users or service accounts.
+
+Q27. How does traffic flow from domain → Ingress → Service → Pod?
+Answer:
+When a user accesses an application using a domain name, the DNS resolves the domain to the external load balancer. 
+The load balancer forwards the request to the Ingress Controller, which reads the Ingress rules and routes traffic based on host or path rules.
+The Ingress then forwards the request to the appropriate Kubernetes Service, which load balances the request to one of the backend Pods. 
+Finally, the request reaches the container running the application inside the pod.
+
+Q28. What are Kubernetes Services?
+Answer:
+Kubernetes Service is an abstraction that provides a stable network endpoint to access a set of Pods.
+Since Pods are ephemeral and their IP addresses change when they are recreated, a Service provides a stable IP address and DNS name to access those Pods.
+Services also perform load balancing, distributing traffic across multiple Pods.
+
+Q29. What is the difference between ClusterIP, NodePort, and LoadBalancer services?
+Answer:
+Kubernetes provides different types of Services to expose applications.
+ClusterIP is the default service type that exposes the application internally within the cluster using a stable virtual IP address.
+NodePort exposes the service on a specific port on each node, allowing external users to access the application using the Node IP and NodePort.
+LoadBalancer creates an external load balancer provided by the cloud platform, which exposes the service to the internet and distributes traffic to the backend pods.
+
+Q30. What is the difference between LoadBalancer Service and Ingress?
+Answer:
+In Kubernetes, applications running inside Pods are not accessible from outside the cluster by default.
+To allow external users to access applications, Kubernetes provides different mechanisms.
+Two common ways are:
+LoadBalancer Service:
+
+A LoadBalancer Service exposes a Kubernetes service to the internet by creating an external cloud load balancer.
+For each service we have to create a load balancer, This can create many cloud load balancers, increasing cost.
+LoadBalancer cannot do: path-based routing,host-based routing
+
+Ingress:
+Ingress is a Kubernetes API object used to manage external HTTP/HTTPS traffic routing to services inside the cluster.
+We can route the traffic to multiple services using single Ingress. This will reduce the infrastructure cost.
+
+Q31. How do you expose a service using Ingress?
+Answer:
+To expose a service using Ingress, we first deploy the application pods, then create a ClusterIP service to expose the pods internally, 
+and finally create an Ingress resource with routing rules that map external requests to the service. 
+An Ingress Controller is required to implement these rules and handle incoming traffic.
+ 
+Q32. How do you set up an Ingress Controller?
+Answer:
+An Ingress Controller is a component that implements the rules defined in an Ingress resource.
+The Ingress object itself only contains routing rules, but it cannot process traffic.
+The Ingress Controller reads those rules and routes external traffic to the appropriate services.
+
+Q33. How pods communicate?
+Answer:
+In Kubernetes, each Pod receives a unique IP address in a flat network, which allows Pods to communicate directly with each other across the cluster. 
+However, Pods are ephemeral and their IP addresses can change when they are recreated. 
+Therefore, instead of using Pod IPs directly, applications usually communicate through Kubernetes Services, 
+which provide a stable IP address and DNS name and load balance traffic to the backend Pods.
+
+Q34. What is a headless service?
+Answer:
+A Headless Service is a Kubernetes service that does not have a ClusterIP. Instead of load balancing traffic, 
+it returns the IP addresses of individual Pods, allowing clients to communicate directly with specific Pods. 
+It is commonly used with StatefulSets to provide stable network identities.
+
+Q35. How do you perform rollback in Kubernetes?
+Answer:
+Rollback in Kubernetes means going back to the previous version of the running application.
+When you perform the update for each update deployment creates one replicaset.
+So we can go back to the previous replicaSet and replicaset creates pods automatically
+let us first check the deployment status using kubectl rollout status deployment <deployment-name>
+if deployment failed, check the deployment history kubectl rollout history deployment <deployment-name>
+i can rollback to the previous version using kubectl rollout undo deployment <deployment-name>
+if you want t rollback to specific version use kubectl rollout undo deployment <deployment-name> --to-revision=1
+
+Q36. How do you decide whether to roll back or apply a hotfix in production?
+Answer:
+1. Rollback Scenario
+I would choose rollback when:
+The issue is critical and impacting production users
+The previous version was stable
+Fixing the issue will take more time
+There is a high risk of further failures
+In this case, rolling back quickly restores the last known working version, minimizing downtime.
+kubectl rollout undo deployment <deployment-name>
+
+2. Hotfix Scenario
+I would apply a hotfix when:
+The issue is minor
+It affects only a small functionality
+The fix is simple and quick
+The deployment pipeline can deliver the fix quickly
+Example:
+configuration mistake
+small code bug
+environment variable change
+In such cases, a hotfix can be deployed using CI/CD pipelines or patch updates.
+
+Q37. How do you stop broken code from reaching production?
+Answer:
+To stop broken code from reaching production, we implement multiple quality and security checks in the CI/CD pipeline. 
+These checks ensure that code is validated before it gets deployed.
+1. Code Reviews (Pull Requests)  Developers submit code through pull requests, and other team members review the code before merging.
+2. Automated Testing in CI Pipeline  ---unit tests, integration tests.
+3. Static Code Analysis-- SonarQube
+4. Security and Dependency Scanning --Trivy, OWASP Dependency Check
+5. before production, deployments are tested in a staging environment that mirrors production.
+
+
+Q38. How does Horizontal Pod Autoscaler work?
+Answer:
+Horizontal Pod Autoscaler (HPA) is a Kubernetes feature that automatically scales the number of pods in a deployment based on resource utilization such as CPU or memory.
+HPA monitors metrics from the pods using the Kubernetes Metrics Server. It compares the current resource usage with the target utilization defined in the HPA configuration.
+If the resource usage exceeds the target threshold, Kubernetes increases the number of pod replicas. If the usage decreases, it reduces the number of replicas.
+
+Q39. How do you check high CPU/memory consuming pods?
+Answer:
+To check high CPU or memory consuming pods in Kubernetes, we use the kubectl top pod command. 
+This command retrieves resource usage metrics from the Metrics Server and displays CPU and memory consumption for each pod. 
+It helps identify pods that are consuming excessive resources.
+
+Q40. What happens when a node goes into NotReady state?
+Answer:
+When a node goes into a NotReady state, it means the Kubernetes control plane cannot communicate with the kubelet on that worker node. 
+In this situation, the Node Controller marks the node as NotReady and the scheduler stops placing new pods on that node.
+If the node remains unreachable for a certain period (typically around 5 minutes),
+Kubernetes evicts the pods running on that node. The controllers such as Deployments or ReplicaSets then recreate those pods, 
+and the scheduler schedules them on other healthy nodes in the cluster.
+
+Q41. Pod in Pending state?
+Answer:
+A Pod is in Pending state when it has been accepted by the Kubernetes API server but has not yet been scheduled to run on a node. 
+This usually happens when the scheduler cannot find a suitable node to run the pod.
+Common reasons include insufficient CPU or memory resources, unsatisfied node selectors or affinity rules, taints and tolerations restrictions,
+ or unavailable Persistent Volumes required by the pod.
+
+Q42. How do you debug a Pending Pod?
+Answer:
+debugging-- first check pods status using kubectl get po.
+Next kubectl describe pod podname from here you will come to know actual issue like insufficient memory issue or node selector issue, taint and tolerance issue.
+
+Q43. ImagePullBackOff?
+Answer:
+ImagePullBackOff occurs when Kubernetes is unable to pull a container image from the container registry. 
+The kubelet repeatedly tries to pull the image, and after several failed attempts it enters the ImagePullBackOff state.
+Most possible reasons for imagepull backoff error is wrong image specified or wrong image tag.
+
+Q44. Deployment stuck in progressing — how do you troubleshoot?
+Answer:
+Check deployment status using kubectl get deploy deployment name
+check kubectl describe deployment deploymentname
+You will come to know the most possible reason.
+Then check for ReplicaSet kubectl get rs.
+check pods kubectl get po
+container logs kubectl logs cont 
+possible reasons are imagepull error, crashloop backoff error, readiness probes failing, insufficient resources.
+
+Q45. Persistent Volume not attaching — how do you debug?
+Answer:
+If a Persistent Volume is not attaching to a pod, I first check the pod status using kubectl get pods. 
+Then I run kubectl describe pod <pod-name> to check the events section for volume attachment errors.
+Next, I verify the PersistentVolumeClaim using kubectl get pvc to ensure it is in the Bound state. 
+If the PVC is Pending, it means no matching PersistentVolume is available.
+I also check the PersistentVolume using kubectl get pv and verify the storage class, access mode, and capacity. 
+In some cases, the volume might already be attached to another pod when using ReadWriteOnce storage.
+
+Q46. If a pod is continuously restarting, how do you troubleshoot?
+Answer:
+If a pod is continuously restarting the it will finally lead to crashloopbackoff error.
+first check the list of pods using kubectl get po
+Then, check for the error kubectl describe po podname
+you will come to know the possible reason here.
+then check logs using kubectl logs podname
+then check for previous logs using kubectl logs podname --previous.
+
+Q47. If a pod is not coming up, what steps will you take?
+Answer:
+If a pod is not coming up i will start troubleshoot from my side.
+First i will the pod using kubect get po
+then i will describe the pod kubectl describe po podname -- from here we will come to know the issue whether it is crashloopbackoff error or imagepull error
+further i will check logs using kubectl logs podname  here will come to know weather it is config maps or secrets issue.
+you can check container logs using kubectl logs podname -c contname.
+if pod restared then to check previous logs kubectl logs podname --previous.
+
+Q48. Pod running but service unreachable?
+Answer:
+If a pod is running but the service is unreachable, I first verify whether the service selector matches the labels of the pods. 
+If the selector does not match, the service will not route traffic to the pods.
+Next, I check whether the service has endpoints using kubectl get endpoints <service-name>. 
+If there are no endpoints, it indicates the service is not linked to any pods.
+I also verify that the service port and targetPort match the container port defined in the pod.
+If necessary, I update the service configuration and apply the changes.
+
+Q49. No logs because container never started?
+Answer:
+If there are no logs because the container never started, it usually means the container failed before the application process began. 
+In such cases, I check the pod events using kubectl describe pod <pod-name> to identify issues such as image pull errors, volume mount failures, or configuration issues.
+
+Q50. How do you implement ArgoCD?
+Answer:
+ArgoCD is a GitOps continuous delivery tool for Kubernetes that automatically deploys applications to a cluster by synchronizing the cluster state with the configuration stored in a Git repository.
+To implement ArgoCD, I first install it in the Kubernetes cluster using the official manifests. 
+Then I expose the ArgoCD server and access the UI. 
+After that, I connect the Git repository containing Kubernetes manifests and create an ArgoCD Application resource. 
+ArgoCD continuously monitors the Git repository and synchronizes the cluster state with the desired state defined in Git.
+
+Q51. How do you design a highly available Kubernetes cluster?
+Answer:
+To design a highly available Kubernetes cluster, we deploy multiple control plane nodes behind a load balancer, run an etcd cluster with at least three nodes, 
+and distribute worker nodes across multiple availability zones. 
+Applications run with multiple replicas using deployments, 
+and traffic is managed through services and ingress controllers to ensure fault tolerance and high availability
+
+Q52. Cluster upgrades in EKS?
+Answer:
+First upgrade the EKS control plane version.aws eks update-cluster-version --name <cluster-name> --kubernetes-version <target-version>
+This will upgrade the components in the control plane like API server, schedular, etcd, controller manager.
+during this upgrade the control plane will be still available.
+After the control plane upgrade, update the worker nodes to match the new version.
+aws eks update-nodegroup-version --cluster-name <cluster-name> --nodegroup-name <nodegroup-name>
+After nodes are upgraded, update cluster add-ons such as: VPC CNI
+aws eks update-addon --cluster-name <cluster-name> --addon-name vpc-cni
+The cluster is upgraded in rolling fashion to avoid downtime.
