@@ -1,0 +1,102 @@
+EC2 creation using terraform
+
+resource "aws_instance" "myinstance" {
+tags = {
+Name = var.iname
+Environment = var.ienv
+}
+
+ami = "ami-03ea746dala2e36e7"
+instance_type = "t3.micro"
+key_name = "simha"
+availability_zone = "us-east-2a"
+count = 2
+root_block_device {
+volume_size = 10
+}
+}
+
+variable "iname" {
+type = string
+default = "Server-1"
+}
+
+variable "ienv" {
+type = string
+default = "Prod"
+}
+
+
+S3 bucket using terraform
+
+provider "aws" {
+region = "us-east-2"
+}
+
+resource "aws_s3_bucket" "mybucket" {
+bucket = "simha.bucket1"
+}
+resource "aws_s3_bucket_versioning" "bucketversioning" {
+bucket = "aws_s3_bucket_mybucket.id"
+versioning_configuration {
+status = "Enabled"
+}
+}
+
+remote backend using s3
+
+terraform {
+backend "s3" {
+bucket = "aws_s3_bucket_mybucket.id"
+key = "Mustafa/terraform.tfstate"
+region = "us-east-2"
+}
+
+VPC, Subnet using terraform
+
+resource "aws_vpc" "myvpc" {
+tags = {
+Name = "Terraform-VPC"
+}
+cidr_block = "10.0.0.0/21"
+instance_tenancy = "default"
+enable_dns_hostnames = "true"
+}
+
+resource "aws_subnet" "mysubnet" {
+vpc_id = aws_vpc.myvpc.id
+tags = {
+Name = "subnet-1" 
+}
+availability_zone = "us-east-2a"
+cidr_block = "10.0.0.0/24"
+map_public_ip_on_launch = "true"
+}
+
+
+Security group using dynamic blocks by terraform
+
+resource "aws_security_group" "mysg" {
+name = "Terraform-sg"
+description = "this is created by terraform"
+dynamic "ingress"  {
+for_each = var.ports
+content {
+from_port = ingress.value
+to_port = ingress.value
+protocol = "tcp"
+cidr_blocks = ["0.0.0.0/0"]
+}
+}
+egress {
+from_port = o
+to_port = 0
+protocol ="-1"
+cidr_blocks = ["0.0.0.0/0" ]
+}
+}
+
+variable "ports" {
+type = list(number)
+default = [22,80,8080,3306,9000]
+}

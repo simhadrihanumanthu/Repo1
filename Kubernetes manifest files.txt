@@ -1,0 +1,52 @@
+Pod Manifest file:
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod1
+  labels:
+    app: nginx
+spec:
+  containers:
+  - name: cont1
+    image: nginx
+    ports:
+    - containerPort: 80
+
+Service Manifest file:
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: service1
+spec:
+  type: LoadBalancer
+  selector:
+    app: nginx
+  ports:
+    - port: 80
+      targetPort: 80
+
+Deployment file:
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deployment1
+  labels:
+    app: nginx
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: cont1
+        image: nginx:latest
+        ports:
+        - containerPort: 80
