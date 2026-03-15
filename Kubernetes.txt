@@ -450,3 +450,31 @@ aws eks update-nodegroup-version --cluster-name <cluster-name> --nodegroup-name 
 After nodes are upgraded, update cluster add-ons such as: VPC CNI
 aws eks update-addon --cluster-name <cluster-name> --addon-name vpc-cni
 The cluster is upgraded in rolling fashion to avoid downtime.
+
+Q53. How do you deploy application using HELM ?
+Answer:
+First we add the Helm repository using the command helm repo add repo1 <repo-url>. 
+Then we update the repository using helm repo update. 
+After that we search the required chart using helm search repo. 
+Then we install the application using helm install release1 repo1/chartname.
+ We can check installed releases using helm list. To check release history we use helm history release1. 
+If required, we can rollback to a previous version using helm rollback release1 <revision-number>.
+
+Q54. What is Affinity? explain types of affinity in Kubernetes.
+Answer:
+Affinity is a feature in Kubernetes that allows you to control where Pods are scheduled based on certain rules.
+It helps Kubernetes decide:
+which node a pod should run on
+which pods should run together
+which pods should avoid each other
+
+Node Affinity:
+Node affinity controls which nodes a pod can be scheduled on.
+It works based on node labels.
+
+Pod Affinity
+Pod affinity controls which pods should be placed together.
+
+Pod Anti-Affinity
+Pod anti-affinity ensures pods are NOT scheduled together.
+
