@@ -1,0 +1,342 @@
+Q1. What is Terraform?
+Answer:
+Terraform is an Infrastructure as Code (IaC) tool developed by HashiCorp that allows us to provision and manage infrastructure using configuration files.
+It works on HashiCorp  Language, to define infrastructure resources such as virtual machines, networks, and storage. 
+Terraform supports multiple cloud providers like AWS, Azure, and GCP through providers, and it maintains the infrastructure state using a state file.
+
+Q2. What is Infrastructure as Code (IaC)?
+Answer:
+Infrastructure as Code (IaC) is the practice of managing and provisioning infrastructure using code instead of manual processes.
+Instead of manually creating resources like servers, networks, or databases through cloud consoles,
+we define the infrastructure in configuration files and automate the provisioning process. 
+
+Q3. What is a Terraform state file?
+Answer:
+A Terraform state file is used to store information about the infrastructure that is created by Terraform.
+It keeps a mapping between the Terraform configuration files and the real infrastructure resources that are created in the cloud. 
+Terraform uses this state file to track resources, detect changes, and determine what actions need to be taken when running terraform plan or terraform apply.
+
+Q4. What is the use of Terraform state file?
+Answer:
+Terraform state file is used to store the information about the infrastructure created by Terraform.
+Terraform state file compares the infrastructure configuration files with actual infrastructure created in the cloud.
+It is used to manage the resources and detect the changes and determine what actions need to be performed when running terraform plan or terraform apply.
+
+Q5. What happens if Terraform state file is deleted?
+Answer:
+If the Terraform state file is deleted, Terraform loses the record of the infrastructure it previously created. 
+Since the state file maintains the mapping between Terraform configuration files and real infrastructure resources, 
+Terraform will no longer know which resources it manages. As a result, during the next terraform plan or terraform apply, 
+Terraform may attempt to recreate the resources, which can lead to duplicate infrastructure or conflicts.
+
+Q6. What is Terraform backend?
+Answer:
+A Terraform backend defines where Terraform stores its state file. By default, Terraform stores the state file locally, 
+but in production environments we usually configure a remote backend to store the state file in a shared location such as AWS S3.
+When ever you perform Terraform apply command state file compares configuration files with Actual Infra created in the cloud 
+and make changes accordingly and update the state file. When ever the state file is update Terraform backend stores the state file in S3 buckets.
+
+Q7. What is the difference between local and remote backend?
+Answer:
+Local backend: Terraform stores the stores the data about the infrastructure using state file, by default it the stores the state file in local system this is called Local.
+Remote backend: Terraform backend is a service used to store the state file in remote services like S3 buckets, 
+this backend will have the data where terraform is storing the state file in shared location. 
+Terraform backend is used to avoid loss of state file.   
+
+Q8. What is state locking in Terraform?
+Answer:
+State locking in Terraform prevents multiple users from modifying the Terraform state file at the same time. 
+When a Terraform operation such as terraform apply runs, Terraform locks the state file to ensure that only one process can make changes to the infrastructure. 
+This prevents conflicts and ensures consistency of the infrastructure state.
+
+Q9. How do you manage Terraform state in a team?
+Answer:
+In a team environment, Terraform state is managed using a remote backend instead of storing it locally. 
+The state file is typically stored in a shared storage service such as an S3 bucket so that all team members can access the same state file.
+To prevent multiple users from modifying the state simultaneously, state locking is enabled using services like DynamoDB. 
+This ensures that only one Terraform operation can run at a time, preventing conflicts and state corruption. 
+Additionally, versioning can be enabled on the storage backend to maintain backups of the state file.
+
+Q10. What is the difference between terraform plan and terraform apply?
+Answer:
+terraform plan is used to preview the changes that Terraform will make to the infrastructure. 
+It compares the Terraform configuration with the current state and shows what resources will be created, modified, or destroyed.
+
+terraform apply executes the changes proposed in the plan and provisions or updates the infrastructure accordingly. 
+After the infrastructure changes are completed, Terraform updates the state file to reflect the new infrastructure state.
+
+Q11. What are Terraform provisioners?
+Answer:
+Terraform provisioners are used to execute scripts or commands on local or remote resources after they are created. 
+They are commonly used to perform configuration tasks such as installing software or copying files.
+
+Three types of Provisioners:
+Local Exec: The local-exec provisioner runs commands on the local machine where Terraform is executed, not on the remote server.
+Remote Exec: The remote-exec provisioner is used to run commands on the remote server after it is created.
+file: Terraform provisioners are used to execute scripts or commands on local or remote resources after they are created. 
+They are commonly used to perform configuration tasks such as installing software or copying files.
+
+Q12. What are data sources in Terraform?
+Answer:
+Data sources in Terraform are used to retrieve information about existing infrastructure resources instead of creating new ones. 
+They allow Terraform configurations to reference existing resources such as VPCs, subnets, or AMIs.
+Example Scenario:
+Suppose an existing VPC already exists in AWS, and you want to launch an EC2 instance inside that VPC.
+Instead of creating a new VPC, you can retrieve the existing VPC details using a data source.
+
+Q13. What are Terraform workspaces?
+Answer:
+Terraform workspaces are used to manage multiple environments using the same Terraform configuration. 
+Each workspace maintains its own separate state file, allowing the same code to provision different infrastructure for environments such as dev, test, and production.
+
+Q14. How do you call a local module?
+Answer: A local module is a module that exists within your project directory.
+We call a local module using the module block and specify the local path of the module.
+
+Q15. What is a Terraform module?
+Answer:
+Terraform modules are used to organize and reuse Terraform resources. 
+A module is a collection of Terraform configuration files grouped together to create a specific infrastructure component. 
+For example, we can create modules for resources like VPC, EC2, or databases and reuse them across multiple environments such as dev, test, and prod. 
+This helps maintain clean, reusable, and modular Terraform code.
+
+Q16. What are best practices for production Terraform usage?
+Answer:
+Some of the best practices for Terraform usage in production include using remote backend services such as S3 to store the Terraform state file.
+State locking should be implemented using DynamoDB to prevent multiple users from modifying the state file simultaneously. 
+Terraform modules should be used to organize and reuse infrastructure code. 
+Security scanning tools like tfsec can be used to identify security vulnerabilities in Terraform configurations. 
+Terraform lifecycle rules can also be implemented to control resource creation and deletion behavior.
+
+Q17. What is the Terraform workflow?
+Answer:
+Terraform workflow includes:
+terraform init: initializes the working directory and downloads the required provider plugins and modules based on the configuration files.
+terraform plan: gives a preview of the changes Terraform will make by comparing the configuration with the current infrastructure state.
+terraform apply: creates or modifies the infrastructure resources and updates the state file accordingly.
+terraform destroy: deletes the infrastructure resources defined in the configuration and updates the state file.
+
+Q18. What is the difference between Terraform and AWS CloudFormation?
+Answer:
+Terraform and AWS CloudFormation are both Infrastructure as Code tools used to automate infrastructure provisioning. 
+Terraform supports multiple cloud providers such as AWS, Azure, and GCP, while AWS CloudFormation works only with AWS services. 
+Terraform uses HashiCorp Configuration Language (HCL) for defining infrastructure, whereas CloudFormation templates are written in JSON or YAML. 
+Terraform manages infrastructure using a state file, while CloudFormation manages resources through stacks.
+
+Q19. Can Terraform manage on-prem servers?
+Answer:
+Yes. Terraform can manage on-premises infrastructure if there is a provider or API available for that infrastructure.
+Terraform communicates with infrastructure through providers, so if a provider exists for an on-prem platform, Terraform can manage it.
+
+Q20. If your Terraform version is fixed, will it automatically upgrade?
+Answer:
+No, Terraform will not automatically upgrade if the version is fixed in the configuration. 
+Terraform uses the version specified in the required_version constraint, and upgrading Terraform must be done manually by installing a newer version.
+
+Q21. How do you recover from a deleted state file?
+Answer:
+In Terraform, we usually store the state file in a remote backend such as an AWS S3 bucket. 
+If the state file is deleted, we can recover it from the S3 bucket, especially if versioning is enabled. 
+After restoring the state file, we can run terraform plan to verify the infrastructure.
+If there is no remote backend or backup available, tools like Terraformer can be used to scan existing cloud resources 
+and generate Terraform configuration so that the infrastructure can be managed again using Terraform.
+
+Q22. What happens when terraform apply fails halfway?
+Answer:
+If terraform apply fails midway, Terraform stops execution immediately,
+but any resources that were successfully created before the failure remain in the infrastructure.
+Terraform will also update the state file with the resources that were successfully created before the failure occurred.
+When Terraform apply is run again, it will attempt to create the remaining resources.
+
+Q23. If two people are working on the same Terraform file, how do you avoid conflicts?
+Answer:
+State locking in Terraform prevents multiple users from modifying the Terraform state file simultaneously. 
+When a Terraform operation such as terraform apply runs, Terraform locks the state file so that only one process can make changes to the infrastructure. 
+This prevents conflicts and maintains consistency. In team environments, remote backends such as S3 with DynamoDB locking are commonly used to implement this mechanism.
+
+Q24. What are the most commonly used Terraform commands?
+Answer:
+terraform init ---> Initialize Terraform
+terraform plan   ---> Preview changes
+terraform apply	---> Create/modify infrastructure
+terraform destroy ---> Delete infrastructure
+terraform fmt	---> Format Terraform code
+terraform validate ---> Validate configuration
+terraform workspace ---> Manage environments
+
+Q25. If you have 100 resources and want to apply only one, how do you do it?
+Answer:
+If I want to apply only one resource, I can use the -target option with the terraform apply command. 
+This allows Terraform to apply changes only to the specified resource instead of the entire infrastructure.
+terraform apply -target=aws_myinstance.myinstance.id
+
+Q26. What is terraform taint?
+Answer:
+Terraform taint is used to mark a resource as tainted so that it will be destroyed and recreated during the next terraform apply. 
+For example, if an EC2 instance is tainted, when we run terraform apply, Terraform will destroy the existing instance and create a new one.
+
+Q27. What is terraform taint / -replace?
+Answer: 
+Terraform taint is used to mark a resource so that it will be destroyed and recreated during the next terraform apply. 
+When a resource is tainted, Terraform will delete the existing resource and create a new one during the next apply.
+In newer Terraform versions, instead of using terraform taint, 
+we can use the -replace option with terraform apply to recreate a specific resource. 
+
+Q28. What is terraform import?
+Answer:
+Terraform import is used to bring existing infrastructure that was created outside Terraform under Terraform management.
+It maps the existing resource to the Terraform state file so that Terraform can manage it. 
+Before importing, the resource configuration must already exist in the Terraform code. 
+If many resources need to be imported, tools like Terraformer can be used to scan cloud infrastructure and generate Terraform configuration.
+
+Q29. Can we import existing resources into Terraform?
+Answer:
+Yes, we can import existing resources that were created outside Terraform. 
+For this, we must first define the resource configuration in the Terraform code. 
+Then we can run the terraform import command to map the existing resource to the Terraform state file.
+If there are many resources to import, tools like Terraformer can be used to scan existing cloud infrastructure and generate Terraform configuration for those resources.
+
+Q30. What is the difference between provider block and resource block?
+Answer:
+Provider block is used to configure the cloud provider that Terraform will interact with. 
+It contains details such as provider name, region, and authentication configuration. 
+When terraform init runs, Terraform downloads the required provider plugins.
+
+Resource block is used to define the infrastructure resources that Terraform will create, such as EC2 instances, S3 buckets, or networks. 
+When terraform apply is executed, Terraform provisions the resources defined in the resource blocks.
+
+Q31. What is the output block in Terraform?
+Answer:
+Terraform output block is used to display important values from the infrastructure created by Terraform, such as IP addresses, DNS names, or service URLs. 
+Instead of checking the cloud console, these values can be directly retrieved using output blocks. 
+Output blocks are also used to expose resource attributes and pass values between Terraform modules.
+
+Q32. In how many ways can we pass values in Terraform?
+Answer: 
+In Terraform, values can be passed using variable blocks. 
+These values can be provided through default values, .tfvars files, command line variables, or environment variables. 
+For sensitive values such as passwords or secrets, tools like HashiCorp Vault can be used to securely retrieve them.
+
+Q33. What is the difference between variables, locals, and outputs?
+Answer:
+Variables are used to pass input values into Terraform configuration. 
+These values can be provided through variable blocks, tfvars files, or command-line arguments.
+
+Locals are used to define reusable values within the Terraform configuration so that the same value or expression can be used multiple times in the code.
+
+Outputs are used to display important information such as IP addresses, service URLs, or DNS names after the infrastructure resources are created.
+
+Q34. How to structure Terraform for multiple environments?
+Answer:
+Terraform modules are used to organize and reuse infrastructure resources such as EC2, VPC, and S3. 
+For multiple environments like dev, test, and prod, these modules can be reused in different workspaces or environment-specific configurations. 
+Each workspace maintains a separate state file, which helps manage multiple environments independently.
+
+Q35. Difference between for_each and count?
+Answer:
+Count: count is used when you want to create multiple identical resources.
+Terraform creates resources using numeric indexes.
+
+Example:
+resource "aws_instance" "web" {
+  count         = 3
+  instance_type = "t2.micro"
+}
+
+For_each: 
+for_each is used when you want to create resources based on different values (maps or sets).
+
+Example:
+resource "aws_instance" "web" {
+  for_each = {
+    dev  = "t2.micro"
+    prod = "t2.medium"
+  }
+
+  instance_type = each.value
+}
+
+Q36. How Terraform handles dependencies?
+Answer:
+Terraform automatically manages resource dependencies using a dependency graph.
+Terraform analyzes the configuration and determines the order in which resources should be created or destroyed.
+
+Example:
+resource "aws_instance" "web" {
+  instance_type = "t2.micro"
+
+  depends_on = [aws_security_group.sg]
+}
+
+Now Terraform ensures:
+
+Security group created first
+↓
+EC2 instance created
+
+Q37. What is implicit and explicit dependency (depends_on)?
+
+Implicit dependency: Terraform automatically detects the required dependencies, it will create the dependencies first and then creates the resources.
+
+Explicit dependency: If terraform not able to detect the dependency we need to mention those dependencies by using depends_on.
+so it will create the dependencies before resource creation
+
+Q38. What is drift detection in Terraform?
+Answer:
+Drift detection in Terraform refers to identifying changes made to infrastructure outside of Terraform. 
+These changes may include modifying, deleting, or creating resources manually in the cloud console. 
+Terraform detects drift when we run terraform plan, which compares the Terraform configuration, state file, and the actual infrastructure.
+
+If we want to accept the external changes, we can run terraform apply --refresh-only to update the state file. 
+If we want Terraform to revert the manual changes, we can run terraform apply so Terraform restores the infrastructure to match the configuration.
+
+Q39. How do you create 50 EC2 instances dynamically?
+Answer:
+We can create multiple EC2 instances dynamically using the count meta-argument in the resource block. 
+By setting count = 50, Terraform will create 50 EC2 instances automatically.
+
+Q40. In VPC, how will you create 4 subnets in a single resource block?
+Answer:
+You can create multiple subnets using the count meta-argument in a single resource block.
+
+Q41. What troubleshooting have you done in Terraform?
+Answer:
+Some common Terraform troubleshooting scenarios include state locking issues, drift detection when infrastructure is modified outside Terraform, provider version conflicts during initialization, and resource dependency issues. 
+I typically troubleshoot using commands like terraform plan, terraform state, and terraform import.
+
+Q42. How do you handle secrets in Terraform?
+Secrets in Terraform can be managed using secure secret management tools such as HashiCorp Vault, 
+where sensitive information like usernames and passwords can be stored securely. 
+Terraform can also retrieve secrets from environment variables or cloud secret managers such as AWS Secrets Manager or Azure Key Vault.
+
+Q43. How do you handle sensitive variables in Terraform?
+Answer:
+Sensitive variables in Terraform can be handled by marking variables as sensitive = true, 
+which prevents them from being displayed in CLI output or logs. 
+For better security, secrets can also be stored in external secret management tools such as HashiCorp Vault or cloud services like AWS Secrets Manager or Azure Key Vault, and retrieved during Terraform execution.
+
+Q44. What is the difference between Security Group and NACL?
+Answer:
+Security Group
+A Security Group acts as a virtual firewall for EC2 instances.
+It controls inbound and outbound traffic at the instance level.
+Key Characteristics
+works at instance level
+stateful firewall
+supports allow rules only
+automatically allows return traffic
+
+Network ACL (NACL)
+A Network ACL acts as a firewall at the subnet level.
+It controls traffic entering and leaving the subnet.
+Key Characteristics
+works at subnet level
+stateless firewall
+supports allow and deny rules
+return traffic must be explicitly allowed
+
+Q45. What are ingress and egress rules?
+Answer:
+Ingress and egress rules are used to control network traffic in services like Security Groups or NACLs.
+Ingress rules control incoming traffic to a resource.
+Egress rules control outgoing traffic from a resource.
