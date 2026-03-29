@@ -1,0 +1,125 @@
+Q1. What is the difference between git merge and git rebase and git revert?
+Answer:
+Git Merge: When you are merging feature branch with main branch using Git merge then it maintain the commits history in the order of commits and adds extra commit stating that merge happened.
+Git rebase: When you are merging feature branch with main branch using Git rebase then it rewrite the commit history main branch commits first and followed by feature branch to make commits linear and it will not add any commit stating rebase happened.
+Git revert: git revert is used to delete a specific change using the commit id.
+
+Q2. What is git stash and when do you use it?
+Answer:
+Git stash is used to temporarily save uncommitted changes without committing them to the repository.
+It allows us to switch branches or work on something else without losing our current changes.
+The changes are stored in a stack-like structure and can be reapplied later using commands like git stash apply or git stash pop.
+In real-time, I use git stash when I have incomplete changes but need to quickly switch branches to fix an issue or check something.
+
+Q3. What is git cherry-pick?
+Answer:
+Cherry pick is used to restore the delete commit along with data git cherry-pick commit id
+we can use git cherry pick get a particular commit from one branch to another branch without merging the entire branch.
+
+Q4. What branching strategy do you follow in your project?
+Answer:
+In my project, we follow a Git-based branching strategy similar to GitFlow / feature branching model.
+We have:
+main/master branch → production-ready code
+develop branch → integration branch for ongoing development
+feature branches → created from develop for new features
+release/hotfix branches → for production fixes
+Developers create feature branches, work on changes, and raise pull requests to merge into develop.
+After testing, code is merged into main for production deployment.
+For urgent issues, we create hotfix branches directly from main, fix the issue, and merge back.
+This strategy helps maintain code stability and enables parallel development.
+
+Q5. How do you resolve merge conflicts?
+Answer:
+Merge conflicts occur when two branches modify the same part of a file and Git cannot automatically decide which change to keep.
+To resolve merge conflicts, I follow these steps:
+First, I attempt to merge or rebase the branch
+Git will mark the conflicted files
+I open those files and manually resolve conflicts by choosing the correct changes or combining both
+After resolving, I remove conflict markers (<<<<<<, ======, >>>>>>)
+Then I stage the changes using git add
+Finally, I complete the merge using git commit
+
+This ensures the code is merged correctly without conflicts.
+
+Q6. What is the difference between git pull and fetch?
+Answer:
+Git Fetch downloads the latest changes from the remote repository but does not merge them into the current branch. 
+It allows us to review changes before applying them.
+Git Pull is a combination of git fetch + git merge. It downloads the changes and automatically merges them into the current branch.
+
+In summary:
+Fetch → safe, only downloads
+Pull → downloads + merges automatically
+
+Q7. Difference between Git, GitHub, Bitbucket?
+Answer:
+Git is a distributed version control system used to track changes in code and manage source code history locally.
+GitHub and Bitbucket are cloud-based platforms that host Git repositories and provide additional features like collaboration, pull requests, and CI/CD integration.
+GitHub is widely used and supports both public and private repositories, with strong community and integrations.
+Bitbucket is similar but is more integrated with Atlassian tools like Jira and is commonly used in enterprise environments.
+
+In summary:
+Git → version control system
+GitHub/Bitbucket → platforms to host and manage Git repositories
+
+Q8. What is SCM?
+Answer:
+SCM stands for Source Code Management.
+It is the process of managing and tracking changes in source code over time.
+It helps multiple developers collaborate, maintain version history, and revert to previous versions if needed.
+SCM tools also support features like branching, merging, and version control.
+Common SCM tools include Git, SVN, and Mercurial.
+
+Q9. What is the purpose of branches in Git?
+Answer:
+Branches in Git are used to create separate lines of development, allowing developers to work on features, bug fixes, or experiments without affecting the main codebase.
+They help in isolating changes so that multiple developers can work in parallel without conflicts.
+Once the work is completed and tested, the changes can be merged back into the main branch.
+This improves collaboration and maintains code stability.
+
+Q10. What does git push do?
+Answer:
+git push is used to upload local repository changes to a remote repository.
+After committing changes locally, we use git push to send those commits to a remote branch (like GitHub or Bitbucket), so that others can access them.
+
+Q11. How do you clone or bring GitHub code to your local machine?
+Answer:
+I copy the HTTPS URL from GitHub and run git clone https://github.com/user/repo.git, which creates a local copy of the repository.
+
+Q12. How do you manage code in GitHub?
+Answer:
+In my project, we manage code in GitHub using a structured workflow.
+We follow a branching strategy like feature branches and a main/develop branch
+Developers create feature branches for their work
+After completing changes, we raise a pull request (PR)
+Code is reviewed by team members before merging
+We resolve any conflicts and ensure proper testing before merging into the main branch
+Additionally, we maintain version history, use meaningful commit messages, and integrate CI/CD pipelines for automated builds and deployments.
+This ensures code quality, collaboration, and stability.
+
+Q13. What is GitHub Actions? Have you used it?
+Answer:
+In my project, I used GitHub Actions to automate CI/CD pipelines.
+For example, whenever code is pushed to the repository, it triggers a workflow that builds the application, runs tests, and deploys it to the target environment.
+
+Q14. How do you configure webhooks to trigger Jenkins from Git?
+Answer:
+To configure webhooks to trigger Jenkins from Git, we integrate the Git repository with Jenkins so that any code changes automatically trigger a build.
+Step 1: Configure Jenkins Job
+Create a job (Freestyle or Pipeline) in Jenkins
+In job configuration, enable “GitHub hook trigger for GITScm polling” or similar option
+Step 2: Get Jenkins Webhook URL
+Jenkins provides a webhook endpoint like:
+http://<jenkins-url>/github-webhook/
+Step 3: Configure Webhook in Git
+Go to GitHub/Bitbucket repository settings
+Add a webhook with:
+Payload URL → Jenkins webhook URL
+Event → Push / Pull Request
+Step 4: Test Integration
+Push code to repository
+Webhook sends request to Jenkins
+Jenkins job gets triggered automatically
+This enables automated CI/CD whenever code changes happen.
+

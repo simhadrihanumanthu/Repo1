@@ -1,0 +1,204 @@
+Q1. How do you check disk space usage in Linux?
+Answer:
+To check disk space in Linux, first I use the df -h command to get an overview of all mounted file systems, including total, used, and available space in a human-readable format.
+Based on that, I identify which mount point is running out of space. Then I navigate to that directory and use du -sh * to find which files or folders are consuming more space.
+In real-time, if I find large log files, I check whether they can be cleaned up — for example, deleting logs older than 90 days as per retention policy.
+If cleanup is not sufficient, I coordinate with the team and proceed with increasing disk space after proper approvals.
+
+Q2. Where are system logs stored?
+Answer:
+In Linux systems, most of the system logs are stored under the /var/log directory.
+For example, /var/log/syslog or /var/log/messages contains general system activity logs, and /var/log/auth.log or /var/log/secure contains authentication-related logs.
+In real-time, I use commands like tail -f to monitor logs continuously and less to analyze them. 
+In modern systems, I also use journalctl for troubleshooting systemd-based logs.
+
+Q3. If a server is not starting properly, how do you debug it?
+Answer:
+If a server is not starting, I first check the service status example using systemctl status Jenkins then analyze logs by navigating to /var/log/jenkins/jenkins.log. 
+I also verify disk space, memory and port availability. After identifying the root cause, I fix the issue and restart the service.
+
+Q4. Disk full troubleshooting?
+Answer:
+If disk is full, first I check overall disk usage using df -h to identify which filesystem is running out of space.
+Then I navigate to that particular mount point and use du -sh * to find which directories or files are consuming more space.
+In real-time, large space usually logs valla untundi, so I verify and clean up old logs based on retention policy, for example deleting logs older than 90 days.
+If cleanup is not enough, I coordinate with the team and proceed with increasing disk space after proper approvals.
+Also, I ensure proper log rotation is configured to avoid similar issues in future.
+
+Q5. Can you explain Linux file permissions and how you would give execute permission to a user?
+Answer:
+Linux file permissions control access to files using read, write, and execute permissions for user, group, and others. 
+To give execute permission, I use chmod command, for example chmod +x filename or chmod u+x to give execute access specifically to the owner
+
+Q6. How do you change file permissions?
+Answer:
+To change file permissions in Linux, I use the chmod command. It allows us to modify read, write, and execute permissions for user, group, and others.
+
+Q7. What does 777 permission mean?
+Answer:
+777 means full read, write, and execute permissions for user, group, and others. 
+However, it is not recommended in production as it poses a security risk, so we use more restricted permissions
+
+Q8. What are the numeric values for read, write, and execute permissions?
+Answer:
+In Linux, read has value 4, write has value 2, and execute has value 1. These values are added to set permissions, for example rwx becomes 7.
+
+Q9. What are the default permissions of a fi le and directory?
+Answer:
+Default permissions are 666 for files and 777 for directories, but they are modified by the system’s umask value. 
+In most cases, files get 644 and directories get 755 permissions.
+
+Q10. How do you change the ownership of a file?
+Answer:
+To change the ownership of a file in Linux, I use the chown command. It allows us to change the owner and group of a file.
+
+Q11. Root user but cannot create file?
+Answer:
+Even though root has maximum privileges, there are certain conditions where root may not be able to create files, mainly due to filesystem or mount restrictions.
+If fie system is read only file system then root will not be able to create files, or if file system is full in this case also root will not be able to create files.
+
+Q12. How do you create a user and assign it to a group?
+Answer:
+In Linux, we create a user using the useradd command and assign it to a group either during creation or after creation.
+useradd username, usermod -aG groupname username.
+
+Q13. Where are user details stored in Linux?
+Answer:
+In Linux, user details are mainly stored in the /etc/passwd file.
+
+Q14. Disk free but cannot perform actions?
+Answer:
+Even if disk space is available, operations can fail due to permission issues, read-only filesystem, or security restrictions. 
+In such cases, I check df -h mount status, and permissions to identify the root cause.
+
+Q15. How do you find the largest files in a directory?
+Answer:
+when disk space issue untundi, I use this command to quickly identify large files using du -sh* and clean unnecessary data like old logs.
+
+Q16. How do you check CPU, memory, and running processes in Linux?
+Answer:
+I use top or htop to monitor CPU and processes in real time, free -m to check memory usage, and ps -ef to list running processes. 
+These commands help in identifying performance issues.
+
+Q17. top vs htop?
+Answer:
+htop needs to be installed manually, whereas top is available by default.
+
+top
+Default ga almost every Linux lo untundi
+Keyboard shortcuts use cheyyali
+UI konchem basic
+
+htop
+Advanced version of top
+Colorful UI 👍
+Mouse support kuda untundi
+Easy ga process kill / sort cheyyachu
+
+Q18. Troubleshoot slow server?
+Answer:
+If a server is slow.
+Check CPU usage: top
+Check memory usage: free -m
+Check disk usage: df -h
+Check running processes: ps -ef
+Check logs : /var/log/
+
+Q19. What is zombie process?
+Answer:
+A zombie process is a completed process that still remains in the process table because its parent has not collected its exit status. 
+It does not consume resources but occupies process table entries. It can be identified using ps command with Z state.
+
+Q20. How do you check live logs on a server?
+Answer:
+To check live logs on a server, I use the tail -f command, which continuously monitors the log file in real time.”
+Basic command
+tail -f /var/log/syslog
+
+Q21. You are unable to SSH into a server. How will you troubleshoot?
+Answer:
+To troubleshoot SSH connection issues, first I check authentication details like key pair, username, and password to ensure they are correct.
+Then I verify network connectivity by checking if the server is reachable and whether port 22 is open. 
+I also check security group or firewall rules to confirm SSH access is allowed.
+If the issue still persists, I check the SSH service status on the server and review logs like /var/log/auth.log or /var/log/secure to identify the exact error.
+Additionally, I verify system conditions like disk space, because if the disk is full, SSH login can fail.
+Based on these checks, I identify the root cause and resolve the issue.
+
+Q22. How do you check network connectivity between two servers?
+Answer:
+To check network connectivity between two servers, I use tools like ping, telnet
+ping <server-ip>, telnet <server-ip> 22
+
+Q23. How to see listening ports?
+Answer:
+I use netstat -tulnp or ss -tulnp to check listening ports and identify which services are running on which ports.
+
+Q24. The server is not coming up after reboot. What steps will you take?
+Answer:
+If a server is not coming up after reboot, I first check instance status and try console access also check port 22 is allowed in Security groups. 
+Then I analyze boot logs using journalctl This helps me identify errors that occurred during startup
+check disk space, file system, and failed services. 
+I also verify configuration files like fstab. Based on the findings, I fix the issue and bring the server up.
+
+Q25. A crontab job is failing. How would you debug it? Write a shell script to print the largest of three numbers.
+Answer:
+Command to check list of cronjobs crontab -l
+Now check whether backup.sh has execute permissions or not.
+command to set cronjob 0 2 * * * /home/user/backup.sh 
+
+Script:
+#!/bin/bash
+
+echo "Enter three numbers:"
+read a b c
+
+if [ $a -ge $b ] && [ $a -ge $c ]
+then
+    echo "$a is the largest"
+elif [ $b -ge $a ] && [ $b -ge $c ]
+then
+    echo "$b is the largest"
+else
+    echo "$c is the largest"
+fi
+
+Q25. What is the purpose of #!/bin/bash in a script?
+Answer:
+#!/bin/bash is a shebang line that tells the system to execute the script using the Bash interpreter. 
+It ensures the script runs in the correct shell environment
+
+Q26. How do you pass arguments to a shell script?
+Answer:
+We pass arguments to a shell script from the command line while executing the script.
+./script.sh arg1 arg2 arg3
+
+Q27. How shell script executed?
+Answer:
+bash script.sh
+sh script.sh
+./script.sh
+
+Q28. What is -e in shell?
+Answer:
+we use set -e to stop script execution if any command fails, so that errors are not ignored.
+#!/bin/bash
+set -e
+mkdir test
+cd test
+invalid_command   # idi fail ayithe script ikkade stop avutundi
+echo "This will not run
+
+Q29. What is the difference between soft link and hard link? When would you use each?
+Answer:
+Soft link is like a shortcut, whereas hard link is like another name for the same file
+Soft link use
+When I want to create shortcuts, like linking config files or directories.
+ln -s source_file softlink
+
+Hard link use:
+When I want multiple references to the same file without duplicating data.
+ln source_file hardlink
+
+Q30. What happens when you run hostnamectl?
+Answer:
+hostnamectl displays system hostname and related details like OS, kernel, and architecture. It can also be used to change the hostname.

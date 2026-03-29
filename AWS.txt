@@ -1,0 +1,409 @@
+Q1. What AWS services have you worked on in your project?
+Answer:
+In my project, I worked on multiple AWS services as part of building and managing application infrastructure.
+I used EC2 for hosting application servers and managed scaling using Auto Scaling Groups (ASG)
+I configured Application Load Balancer (ALB) for routing traffic and ensuring high availability
+I worked with S3 for storing application logs and backup data
+I used IAM for role-based access control, creating roles and policies for secure service communication
+I configured VPC, subnets, route tables, and security groups for network isolation
+I worked with RDS for database management and monitoring
+
+From a DevOps perspective:
+I used ECR to store Docker images
+Deployed containerized applications on ECS and EKS
+Managed Kubernetes workloads, deployments, and troubleshooting in EKS
+Overall, I was involved in deployment, monitoring, and troubleshooting of applications in AWS environment.
+
+Q2. What is the difference between IAM user and IAM role?
+Answer:
+IAM User is an identity created in AWS for a specific person or application, and it has long-term credentials like username/password or access keys for accessing AWS services.
+IAM Role, on the other hand, is an identity with permissions but does not have permanent credentials. 
+It provides temporary credentials using AWS STS and is assumed by trusted entities like EC2, Lambda, or even users.
+In real-time:
+IAM Users are typically used for human access (console/CLI)
+IAM Roles are used for service-to-service communication
+For example, if an EC2 instance needs access to S3, instead of storing access keys, we attach an IAM Role to EC2, which provides temporary credentials securely.
+Using roles is a best practice because it avoids hardcoding credentials and improves security.
+
+Q3. What is Route 53 and how does it resolve traffic?
+Answer:
+Amazon Route 53 is a highly available and scalable DNS service provided by AWS. 
+It is used to map domain names to IP addresses or AWS resources like ALB, EC2, or CloudFront.
+When a user enters a domain like www.example.com, the request first goes to a DNS resolver, 
+which queries Route 53 hosted zone. Route 53 then matches the DNS record and returns the corresponding IP address or resource endpoint.
+Based on routing policies like simple, latency-based, or failover routing, it decides how to direct traffic.
+For example, Route 53 can route traffic to an Application Load Balancer, 
+and then the load balancer forwards the request to backend services like EC2 or Kubernetes clusters.
+It also supports health checks to ensure traffic is routed only to healthy endpoints.
+
+Q4. What is Route 53 and how do you map it to an ALB?
+Answer:
+Amazon Route 53 is a highly available DNS service used to map domain names to AWS resources like ALB.
+To map Route 53 with ALB, we first create a hosted zone for the domain. Inside the hosted zone, we create an Alias record that points to the ALB DNS name.
+When a user enters the domain (like www.example.com), the DNS resolver queries Route 53, which returns the ALB endpoint.
+Then the client connects to the ALB, and the load balancer distributes traffic to backend targets like EC2 or Kubernetes services.
+User → DNS Resolver → Route 53 → ALB DNS → User → ALB
+
+Q5. What is the difference between Security Groups and NACLs?
+Answer:
+Security Groups and NACLs are both used to control traffic in AWS, but they operate at different levels and behave differently.
+Security Groups operate at the instance level (ENI level).
+This means if you allow inbound traffic, the response is automatically allowed, and you don’t need to define outbound rules explicitly.
+
+NACLs (Network ACLs) operate at the subnet level.
+This means you must explicitly allow both inbound and outbound traffic, as responses are not automatically allowed.
+Security Groups only support allow rules, whereas NACLs support both allow and deny rules.
+
+Q6. What is the difference between ALB and NLB?
+Answer:
+ALB (Application Load Balancer) and NLB (Network Load Balancer) differ mainly in the layer they operate and the type of traffic they handle.
+ALB works at Layer 7 (Application Layer) and supports HTTP/HTTPS traffic. 
+It can make routing decisions based on host based and path based routings.
+NLB works at Layer 4 (Transport Layer) and handles TCP/UDP traffic. 
+It routes traffic based on IP address and port without inspecting the application layer.
+ALB is typically used for web applications and microservices where advanced routing is required, 
+while NLB is used for high-performance, low-latency applications or when handling non-HTTP protocols.
+Additionally, NLB supports static IPs and can handle millions of requests per second with very low latency.
+
+Q7. What is a NAT Gateway?
+Answer:
+A NAT Gateway (Network Address Translation Gateway) is an AWS service that allows instances in a private subnet to access the internet, 
+while preventing incoming connections from the internet.
+It is placed in a public subnet and is associated with an Elastic IP. 
+Private subnet instances route their outbound traffic through the NAT Gateway to reach the internet.
+This is commonly used when private instances need to download updates, access external APIs, or pull Docker images, without being exposed to the internet.
+NAT Gateway is managed by AWS and provides high availability and scalability.
+
+Q8. What is an Internet Gateway?
+Answer: 
+An Internet Gateway (IGW) is a VPC component that allows communication between resources in a VPC and the internet.
+It is attached to a VPC and enables instances in public subnets to send and receive traffic from the internet.
+For an instance to access the internet, it must have:
+A public IP (or Elastic IP)
+A route in the subnet’s route table pointing to the Internet Gateway
+Internet Gateway supports both inbound and outbound traffic, unlike NAT Gateway which supports only outbound.
+It is highly available and managed by AWS.
+
+Q9. What is VPC peering?
+Answer:
+VPC Peering is a networking connection between two VPCs that allows them to communicate with each other using private IP addresses.
+It enables resources in different VPCs to interact as if they are in the same network, without using the internet.
+To establish VPC peering:
+A peering connection is created between two VPCs
+Route tables in both VPCs must be updated to allow traffic
+Security groups should allow the required traffic
+It supports communication within the same region or across regions (inter-region peering).
+
+Q10. What is the difference between a Public subnet and a Private subnet?
+Answer:
+The main difference between a Public Subnet and a Private Subnet is based on internet accessibility.
+A Public Subnet is a subnet that has a route to the Internet Gateway (IGW) in its route table, allowing resources inside it to communicate with the internet directly. 
+Typically, instances in public subnets have public IP addresses.
+A Private Subnet, on the other hand, does not have a direct route to the Internet Gateway. 
+Instances in a private subnet cannot access the internet directly. If they need outbound internet access, they use a NAT Gateway.
+In real-time:
+Public subnets are used for resources like Load Balancers, Bastion hosts
+Private subnets are used for application servers, databases, where security is important
+
+Q11. What happens if one AZ fails?
+Answer:
+If one Availability Zone (AZ) fails, the impact depends on how the application is architected.
+In a well-designed architecture, resources are deployed across multiple AZs. If one AZ goes down:
+Traffic is automatically routed to healthy instances in other AZs using a Load Balancer (ALB/NLB)
+Auto Scaling Group (ASG) launches new instances in available AZs to maintain desired capacity
+Databases like RDS (Multi-AZ) automatically failover to standby instance in another AZ
+This ensures high availability and minimal downtime.
+However, if the application is deployed in only one AZ, then it will result in downtime.
+
+Q12. How do you design multi-region architecture?
+Answer:
+Multi-region architecture is designed to ensure high availability and disaster recovery by deploying applications across multiple AWS regions.
+There are two common approaches:
+
+1. Active-Passive (Failover):
+Primary region handles all traffic
+Secondary region is standby
+Route 53 failover routing redirects traffic if primary fails
+
+2. Active-Active:
+Both regions serve traffic simultaneously
+Route 53 uses latency-based or weighted routing
+Improves performance and availability
+
+For implementation:
+Use Route 53 for DNS routing and health checks
+Deploy application infrastructure (EC2/EKS/ALB) in multiple regions
+Use data replication:
+RDS → cross-region read replicas
+S3 → cross-region replication
+Ensure stateless application design
+Use centralized logging and monitoring (CloudWatch, etc.)
+This setup ensures minimal downtime and better user experience globally
+
+Q13. Types of Load Balancers?
+Answer:
+In AWS, there are mainly three types of Load Balancers:
+Application Load Balancer (ALB)
+Network Load Balancer (NLB)
+Classic Load Balancer (CLB)
+
+Application Load Balancer (ALB)
+ALB works at Layer 7 (Application Layer) and handles HTTP/HTTPS traffic.
+It supports advanced routing like:
+Path-based routing (/api, /login)
+Host-based routing
+It is mainly used for web applications and microservices, especially with Kubernetes (Ingress).
+
+Network Load Balancer (NLB)
+NLB works at Layer 4 (Transport Layer) and handles TCP/UDP traffic.
+It is designed for high performance and low latency.
+
+It supports:
+Static IP addresses
+High throughput
+
+Classic Load Balancer (CLB)
+CLB is the older generation load balancer.
+It supports both Layer 4 and Layer 7 but has limited features compared to ALB and NLB.
+It is mostly used in legacy applications.
+
+Q14. What is user data in EC2?
+Answer:
+User Data in EC2 is a script that runs automatically when an EC2 instance is launched.
+It is mainly used for bootstrapping, which means installing software, configuring services, or running commands during instance startup.
+The script can be written in bash, shell script, or cloud-init format.
+By default, user data runs only once at the time of instance creation, unless configured otherwise.
+This helps automate instance setup without manual intervention.
+For example, I can use user data to install Docker, pull an image, and start a container automatically when the EC2 instance is launched.
+
+Q15. Types of S3 storage classes?
+Answer:
+Amazon S3 provides different storage classes based on access frequency, cost, and retrieval time.
+
+The main S3 storage classes are:
+1. S3 Standard – Used for frequently accessed data with high availability and low latency.
+2. S3 Intelligent-Tiering – Automatically moves data between tiers based on access patterns to optimize cost.
+3. S3 Standard-IA (Infrequent Access) – For data accessed less frequently but requires quick retrieval.
+4. S3 One Zone-IA – Similar to Standard-IA but stored in a single AZ, making it cheaper but less resilient.
+5. S3 Glacier Instant Retrieval – For rarely accessed data that still needs immediate access.
+6. S3 Glacier Flexible Retrieval – Archive storage with retrieval time ranging from minutes to hours.
+7. S3 Glacier Deep Archive – Lowest-cost storage for long-term data retention with retrieval time of several hours.
+In real-time, we use lifecycle policies to automatically transition data between these storage classes based on access patterns.
+
+Q16. How does Auto Scaling work with ALB?
+Answer:
+Auto Scaling works with ALB by dynamically adding or removing EC2 instances based on traffic, while ALB distributes incoming traffic across those instances.
+First, EC2 instances are launched as part of an Auto Scaling Group (ASG) and are registered with an ALB Target Group.
+When traffic increases, based on scaling policies (like CPU utilization or request count), ASG launches new instances and automatically registers them with the ALB target group.
+When traffic decreases, ASG terminates instances and deregisters them from the ALB.
+ALB continuously performs health checks on instances and routes traffic only to healthy targets.
+This ensures high availability, load distribution, and cost optimization.
+
+Q17. What is VPC?
+Answer:
+A VPC (Virtual Private Cloud) is a logically isolated network in AWS where we can launch and manage our resources like EC2 instances, databases, and load balancers.
+It gives full control over networking, including IP address range (CIDR), subnets, route tables, and security settings.
+Inside a VPC, we can create public and private subnets, configure Internet Gateway, NAT Gateway, and control access using Security Groups and NACLs.
+This allows us to design secure and scalable infrastructure in AWS. 
+
+Q18. What is the difference between EC2, ECS, and EKS?
+Answer:
+EC2, ECS, and EKS are compute services in AWS, but they differ in how applications are deployed and managed.
+
+EC2 (Elastic Compute Cloud) provides virtual machines where we manually install and manage applications, OS, and dependencies.
+
+ECS (Elastic Container Service) is a container orchestration service where we deploy Docker containers without managing the underlying infrastructure in detail. 
+AWS manages the orchestration.
+
+EKS (Elastic Kubernetes Service) is a managed Kubernetes service that allows us to run containerized applications using Kubernetes, 
+giving more flexibility and control over deployments.
+
+Q18. What type of RDS have you worked with?
+Answer:
+In my project, I worked with Amazon RDS MySQL.
+
+I was involved in provisioning and managing RDS instances, configuring Multi-AZ for high availability, and monitoring performance using CloudWatch.
+I also handled tasks like backups, snapshot management, and basic troubleshooting.
+Additionally, I worked on connecting applications running on EC2/EKS to the RDS instance securely using security groups.
+
+Q19. What is Lambda and where have you used it?
+Answer:
+AWS Lambda is a serverless compute service that allows us to run code without provisioning or managing servers.
+It is event-driven, meaning it executes code in response to events such as S3 uploads, API Gateway requests, or CloudWatch events.
+It automatically handles scaling, availability, and infrastructure management.
+
+Q20. What is CloudFront?
+Answer:
+Amazon CloudFront is a Content Delivery Network (CDN) service that delivers content to users with low latency and high performance by caching it at edge locations worldwide.
+
+It works by storing copies of content like images, videos, or APIs in multiple edge locations. 
+When a user requests content, CloudFront serves it from the nearest edge location instead of the origin server.
+This reduces latency and improves load times.
+
+Q21. What is high availability? Example?
+Answer:
+High Availability (HA) means designing systems in such a way that they remain operational and accessible even if some components fail.
+It is achieved by eliminating single points of failure and distributing resources across multiple availability zones or regions.
+In AWS, we achieve high availability by using services like:
+Load Balancers to distribute traffic
+Auto Scaling Groups to maintain capacity
+Multi-AZ deployments for redundancy
+
+Q22. What are IAM roles, users & policies?
+Answer:
+IAM Users, Roles, and Policies are the core components of access management in AWS.
+IAM User is an identity created for a person or application, which has long-term credentials like username/password or access keys to access AWS resources.
+IAM Role is an identity with permissions but no permanent credentials. It provides temporary credentials and is assumed by trusted entities like EC2, Lambda, or users.
+IAM Policy is a JSON document that defines permissions, specifying what actions are allowed or denied on which resources.
+These policies are attached to users or roles to grant access.
+In real-time:
+Users are used for human access
+Roles are used for service-to-service communication
+Policies define permissions for both
+
+Q23. Difference between IAM policy and Trust policy?
+Answer:
+IAM Policy and Trust Policy serve different purposes in AWS IAM.
+
+IAM Policy (Permission Policy) defines what actions are allowed or denied on AWS resources.
+These policies are attached to IAM users, groups, or roles.
+
+Trust Policy, on the other hand, defines who can assume a role.
+It answers: “Who can use this role?”
+It is attached only to IAM roles.
+In simple terms:
+IAM Policy → permissions
+Trust Policy → access to assume role
+Real-Time Example
+
+For example, if an EC2 instance needs access to S3:
+
+The Trust Policy of the role allows EC2 service to assume the role
+The IAM Policy attached to that role allows access to S3 actions like GetObject
+
+Q24. What is Assume Role and how does it work?
+Answer:
+Assume Role means temporarily taking the permissions of an IAM Role to access AWS resources.
+Instead of using long-term credentials, a user or service requests temporary credentials from AWS STS (Security Token Service) to assume a role.
+The process works like this:
+A user or service requests to assume a role
+AWS verifies the Trust Policy of the role
+If allowed, AWS STS provides temporary credentials (access key, secret key, session token)
+These credentials are used to access AWS resources based on the role’s permissions
+These credentials are temporary and expire after a certain time, improving security.
+
+Q25. What is AWS STS?
+Answer:
+AWS STS (Security Token Service) is a service that provides temporary security credentials to access AWS resources.
+Instead of using long-term access keys, STS allows users or services to assume roles and get temporary credentials like access key, secret key, and session token.
+These credentials have a limited lifetime, which improves security.
+
+Q26. What is a Service Control Policy (SCP)?
+Answer:
+A Service Control Policy (SCP) is a policy used in AWS Organizations to control the maximum permissions for accounts within an organization.
+It does not grant permissions directly but defines what actions are allowed or denied at the account level.
+Even if an IAM user or role has permissions, they cannot perform actions that are restricted by an SCP.
+SCPs are attached to organizational units (OUs) or accounts and are mainly used for governance and security.
+
+Q27. What happens if SCP denies but IAM allows?
+Answer:
+If an SCP (Service Control Policy) denies an action, then the action is denied, even if the IAM policy allows it.
+This is because SCP acts as a guardrail and defines the maximum permissions for an account.
+AWS follows the rule: Explicit Deny always overrides Allow.
+So even if a user or role has permission through IAM, if the SCP blocks that action, it cannot be performed.
+
+Q28. How do services communicate securely within AWS?
+Answer:
+Services in AWS communicate securely using a combination of identity, network, and encryption mechanisms.
+
+1. IAM Roles:
+Services use IAM roles to authenticate and authorize each other without sharing credentials. Temporary credentials from STS are used for secure access.
+2. Network Security:
+Communication is controlled using VPC, Security Groups, and NACLs, ensuring only required traffic is allowed between services.
+3. Private Communication:
+Services communicate over private IPs within a VPC, avoiding exposure to the public internet.
+We can also use VPC Endpoints to access AWS services privately.
+4. Encryption:
+Data is encrypted:
+In transit using HTTPS/TLS
+At rest using AWS KMS
+This layered approach ensures secure communication between AWS services.
+
+Q29. How do you secure S3 buckets?
+
+To secure S3 buckets, I follow a layered security approach:
+1. Block Public Access
+Enable “Block Public Access” to prevent unintended exposure
+2. IAM Policies & Bucket Policies
+Grant access using least privilege principle
+Use bucket policies for controlled access (like specific IP or account)
+3. Encryption
+Enable encryption at rest using SSE-S3 or SSE-KMS
+Use HTTPS for encryption in transit
+4. Access Control
+Avoid using ACLs; prefer IAM and bucket policies
+5. Versioning & Logging
+Enable versioning to recover from accidental deletes
+Enable server access logging / CloudTrail for auditing
+6. VPC Endpoint (Advanced)
+Use VPC endpoints to access S3 privately without internet exposure
+This ensures the bucket is secure from unauthorized access.
+
+Q30. A user cannot access an S3 bucket. How do you troubleshoot?
+Answer:
+If a user cannot access an S3 bucket, I would troubleshoot step by step:
+1. Check IAM Permissions
+Verify if the user/role has required permissions like s3:GetObject or s3:ListBucket
+2. Check Bucket Policy
+Ensure there is no explicit deny
+Validate if the user/account is allowed in the policy
+
+Q31. How do you connect multiple VPCs?
+Answer:
+We can connect multiple VPCs in AWS using different methods depending on the architecture:
+1. VPC Peering
+Direct connection between two VPCs
+Uses private IP communication
+Limitation: no transitive routing
+2. AWS Transit Gateway
+Acts as a central hub to connect multiple VPCs
+Supports transitive routing
+Scalable and easier to manage for large environments
+3. VPN / Direct Connect (Optional)
+Used to connect VPCs with on-premises networks
+
+Q32. Difference between S3, EBS, EFS?
+Answer:
+S3, EBS, and EFS are different types of storage services in AWS, each designed for different use cases.
+S3 (Simple Storage Service) is object storage used to store unstructured data like images, videos, backups, and logs. It is highly scalable and accessed over HTTP/HTTPS.
+EBS (Elastic Block Store) is block storage used with EC2 instances. It acts like a virtual hard disk and is suitable for databases and applications that require low-latency storage.
+EFS (Elastic File System) is a file storage service that provides a shared file system which can be mounted on multiple EC2 instances simultaneously.
+In summary:
+S3 → object storage (via API)
+EBS → block storage (attached to single EC2)
+EFS → file storage (shared across multiple EC2)
+
+Q33. Which S3 storage class are you using and how do you optimize cost?
+Answer:
+In our project, we mainly used S3 Standard for frequently accessed data like application logs and artifacts.
+We used S3 Standard for active data because it provides high availability and low latency.
+To optimize cost, we configured lifecycle policies — for example, logs older than 30 days were moved to Standard-IA, and after 90 days to Glacier for long-term archival.
+This helped reduce storage cost significantly without affecting application performance.
+
+Q34. S3 lifecycle policy?
+Answer:
+In my project, we had application logs stored in S3. We configured a lifecycle policy where logs older than 30 days were moved to Standard-IA, and after 90 days to Glacier. 
+After 180 days, they were deleted.
+
+Q35. Can we replicate S3 data?
+Answer:
+“Yes, S3 supports replication using Cross-Region and Same-Region replication. 
+In my understanding, it is mainly used for disaster recovery and data redundancy. 
+It requires versioning to be enabled on both source and destination buckets, and replication rules are configured to automatically copy objects.
+
+Q36. How do you reduce RDS cost without downtime?
+Answer:
+To reduce RDS cost without downtime, we mainly focus on rightsizing the instance based on CloudWatch metrics and optimizing storage like moving from GP2 to GP3. 
+We also use reserved instances for long-term workloads to reduce cost without impacting performance. 
+For non-production environments, we schedule stop/start to save additional cost.
+
